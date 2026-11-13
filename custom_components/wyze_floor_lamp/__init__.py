@@ -41,7 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: WyzeLampConfigEntry) -> 
             try:
                 await lamp.ensure_connected()
             except Exception as err:  # noqa: BLE001 - retried every minute
-                _LOGGER.debug("%s: connect failed: %s", address, err)
+                _LOGGER.debug("%s: connect failed: %r", address, err)
 
     entry.async_on_unload(async_track_time_interval(hass, _keep_connected, RECONNECT_EVERY))
     entry.async_create_background_task(hass, _keep_connected(), "wyze_floor_lamp connect")

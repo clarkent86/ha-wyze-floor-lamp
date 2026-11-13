@@ -16,6 +16,11 @@ _LOGGER = logging.getLogger(__name__)
 
 KEY_TIMEOUT = 10.0
 REPLY_TIMEOUT = 5.0
+# A whole connection attempt. Bluetooth proxies can stall a connection with no
+# error; without a cap, the attempt holds the lock and every retry (and unload)
+# waits behind it forever.
+CONNECT_TIMEOUT = 45.0
+DISCONNECT_TIMEOUT = 10.0
 
 
 class WyzeFloorLamp:
@@ -60,7 +65,13 @@ class WyzeFloorLamp:
         async with self._lock:
             if self.connected:
                 return
-            await self._connect()
+            try:
+                async with asyncio.timeout(CONNECT_TIMEOUT):
+                    await self._connect()
+            except TimeoutError:
+                _LOGGER.debug("%s: connection attempt timed out", self.address)
+                await self._drop()
+                raise BleakError("connection attempt timed out") from None
 
     async def _connect(self) -> None:
         self._key = None
@@ -77,7 +88,7 @@ class WyzeFloorLamp:
             self._seq = secrets.randbelow(200) + 1
             await client.write_gatt_char(p.WRITE_UUID, p.key_exchange_frame(self._seq, pub), response=False)
             self._key = await asyncio.wait_for(self._key_ready, KEY_TIMEOUT)
-        except (BleakError, asyncio.TimeoutError):
+        except (BleakError, TimeoutError):
             await self._drop()
             raise
         _LOGGER.debug("%s: connected, session key set", self.address)
@@ -89,8 +100,9 @@ class WyzeFloorLamp:
         client, self._client, self._key = self._client, None, None
         if client is not None:
             try:
-                await client.disconnect()
-            except BleakError:
+                async with asyncio.timeout(DISCONNECT_TIMEOUT):
+                    await client.disconnect()
+            except (BleakError, TimeoutError):
                 pass
 
     def _on_disconnect(self, _client) -> None:
@@ -180,6 +192,6 @@ class WyzeFloorLamp:
         self._notify_listeners()
 
     async def stop(self) -> None:
-        async with self._lock:
-            await self._drop()
+        # Don't wait for the lock: a connection attempt may be in progress.
+        await self._drop()
 

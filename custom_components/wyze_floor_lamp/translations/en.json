@@ -1,0 +1,14 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "confirm": {"description": "Set up {name}? Home Assistant keeps a Bluetooth connection open to it, so the Wyze app can't connect while this is running."},
+      "user": {"data": {"address": "Lamp"}}
+    },
+    "abort": {
+      "already_configured": "This lamp is already set up.",
+      "no_devices_found": "No Wyze Floor Lamp found. Make sure a Bluetooth proxy is in range and the Wyze app is closed.",
+      "not_supported": "This Wyze Bluetooth device isn't a floor lamp."
+    }
+  }
+}

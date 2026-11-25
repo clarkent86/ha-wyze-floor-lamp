@@ -23,15 +23,18 @@ The Wyze cloud integrations can't control this lamp because it has no Wi-Fi
 
 ## Install
 
-**HACS (recommended):** the integration is in the HACS default store.
+**Home Assistant 2026.11 and newer (Marketplace, recommended):** go to Settings → Marketplace,
+search for **Wyze Floor Lamp**, select **Install**, then restart Home Assistant when the repair asks.
+
+**Older Home Assistant (HACS):** the integration is in the HACS default store.
 
 [![Open your Home Assistant instance and open this repository in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=clarkent86&repository=ha-wyze-floor-lamp&category=integration)
 
 Or in HACS, search for **Wyze Floor Lamp (Bluetooth)**, download it, then restart Home Assistant.
 
-**HACS custom repository (fallback):** if the search doesn't find it (for example on an older
-HACS), go to HACS → ⋮ → Custom repositories, add `https://github.com/clarkent86/ha-wyze-floor-lamp`
-as an *Integration*, install **Wyze Floor Lamp (Bluetooth)**, then restart Home Assistant.
+**Custom repository (fallback):** if search doesn't find it, add
+`https://github.com/clarkent86/ha-wyze-floor-lamp` as an *Integration*: in the Marketplace with
+**Add from link**, or in HACS under ⋮ → Custom repositories. Install it, then restart.
 
 **Manual:** copy `custom_components/wyze_floor_lamp` into your `config/custom_components/` and restart.
 
